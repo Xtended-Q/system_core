@@ -170,6 +170,7 @@ BatteryMonitor::PowerSupplyType BatteryMonitor::readPowerSupplyType(const String
             { "Wipower", ANDROID_POWER_SUPPLY_TYPE_WIRELESS },
             { "Wireless", ANDROID_POWER_SUPPLY_TYPE_WIRELESS },
             { "DASH", ANDROID_POWER_SUPPLY_TYPE_AC },
+            { "WARP", ANDROID_POWER_SUPPLY_TYPE_AC },
             { NULL, 0 },
     };
 
