@@ -596,7 +596,20 @@ on late-fs
     # Load trusted keys from dm-verity protected partitions
     exec -- /system/bin/fsverity_init --load-verified-keys
 
-on late-fs && property:ro.product.cpu.abilist64=*
+# Only enable the bootreceiver tracing instance for kernels 5.10 and above.
+on late-fs && property:ro.kernel.version=4.9
+    setprop bootreceiver.enable 0
+on late-fs && property:ro.kernel.version=4.14
+    setprop bootreceiver.enable 0
+on late-fs && property:ro.kernel.version=4.19
+    setprop bootreceiver.enable 0
+on late-fs && property:ro.kernel.version=5.4
+    setprop bootreceiver.enable 0
+on late-fs
+    # Bootreceiver tracing instance is enabled by default.
+    setprop bootreceiver.enable ${bootreceiver.enable:-1}
+
+on property:ro.product.cpu.abilist64=* && property:bootreceiver.enable=1
     # Set up a tracing instance for system_server to monitor error_report_end events.
     # These are sent by kernel tools like KASAN and KFENCE when a memory corruption
     # is detected. This is only needed for 64-bit systems.
@@ -956,6 +969,7 @@ on zygote-start && property:ro.crypto.state=unencrypted
     wait_for_prop odsign.verification.done 1
     # A/B update verifier that marks a successful boot.
     exec_start update_verifier_nonencrypted
+    start statsd
     start netd
     start zygote
     start zygote_secondary
@@ -964,6 +978,7 @@ on zygote-start && property:ro.crypto.state=unsupported
     wait_for_prop odsign.verification.done 1
     # A/B update verifier that marks a successful boot.
     exec_start update_verifier_nonencrypted
+    start statsd
     start netd
     start zygote
     start zygote_secondary
@@ -972,6 +987,7 @@ on zygote-start && property:ro.crypto.state=encrypted && property:ro.crypto.type
     wait_for_prop odsign.verification.done 1
     # A/B update verifier that marks a successful boot.
     exec_start update_verifier_nonencrypted
+    start statsd
     start netd
     start zygote
     start zygote_secondary
